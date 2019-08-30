@@ -116,6 +116,8 @@ button:hover {
 <body>
 <form id="startform" action="/" style="border:0px solid #ccc" name="startform">
   <div class="container" style="text-align:center">
+  <img src="https://raw.githubusercontent.com/CurbShifter/BurstDNS/master/BurstDNS-logo.png" alt="" 
+  height="50%" width="50%"> 
  
     <p>Select a node and enter the alias.</p>
     <hr>
@@ -123,14 +125,14 @@ button:hover {
 	<label for="node"><b>Node</b></label>	
 	<select name="wallet" id="wallet">
 		<option value="https://wallet.burst-alliance.org:8125/">burst-alliance.org</option>		
+		<option value="https://wallet1.burst-team.us:2083/">burst-team.us</option>
 		<option value="http://127.0.0.1:8125/">localhost</option>		
-		<option value="https://wallet1.burst-team.us:2083/">burst-team.us [NEEDS CORS TO FUNCTION]</option>
 	</select>
 
     <label for="alias"><b>Burst Alias</b></label>
     <input type="text" placeholder="Enter Burst Alias" name="alias" id="alias" required>
 
-   <p>A correct URL alias opens a new window.</p>
+   <p>An alias that has a URL will open a new window.</p>
 
     <div class="clearfix">
       <button type="button" onclick="OpenAliasURL()" class="signupbtn">Open</button>
@@ -142,7 +144,12 @@ button:hover {
 <script>
 
 console.log(location.search.substr(1));
-document.getElementById("alias").value=location.search.substr(1);
+//document.getElementById("alias").value=location.search.substr(1).replace('-open','');
+document.getElementById("alias").value=location.search.replace('?','').replace('-open','');
+if (location.search.endsWith("-open"))
+{
+	OpenAliasURL();
+}
 
 /*******************************************************************************/
 function Get(url) {
@@ -160,16 +167,21 @@ function OpenAliasURL() {
 
 	var getAliasUrl = walletUrl + "burst?requestType=getAlias&aliasName=" + alias;
 	
-	document.getElementById("result_output").innerHTML = uri;
 	var getAliasResponse = Get(getAliasUrl);
 	console.log(getAliasResponse);
 	var uri = JSON.parse(getAliasResponse);
 	
 	//var uri = getAliasResponse["aliasURI"];
-	console.log(uri.aliasURI);
-	if (isURL(uri.aliasURI)) 
+	if (isURL(uri.aliasURI) && uri.aliasURI.length > 0) 
 	{
+		document.getElementById("result_output").innerHTML = uri.aliasURI;
+		console.log(uri.aliasURI);
 		window.open(uri.aliasURI);
+	}
+	else 
+	{
+		document.getElementById("result_output").innerHTML = "no URL found";
+		console.log("no URL found");
 	}
 }
 
